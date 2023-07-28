@@ -10,9 +10,12 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav [(opened)]="opened" mode="side" class="sidenav">
     <mat-list>
-      <mat-list-item><a routerLink="/home" style="text-decoration: none;">Home</a></mat-list-item>
-      <mat-list-item><a routerLink="/about" style="text-decoration: none;">About</a></mat-list-item>
-      <mat-list-item><a routerLink="/contact" style="text-decoration: none;">Contact</a></mat-list-item>
+      <mat-list-item><a routerLink="/home" routerLinkActive="active-page"
+          style="text-decoration: none;">Home</a></mat-list-item>
+      <mat-list-item><a routerLink="/about" routerLinkActive="active-page"
+          style="text-decoration: none;">About</a></mat-list-item>
+      <mat-list-item><a routerLink="/contact" routerLinkActive="active-page"
+          style="text-decoration: none;">Contact</a></mat-list-item>
     </mat-list>
   </mat-sidenav>
 
