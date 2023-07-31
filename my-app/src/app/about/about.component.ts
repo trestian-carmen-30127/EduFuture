@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
 
+
+
 interface Position {
   coords: {
     latitude: number;
@@ -52,4 +54,5 @@ export class AboutComponent implements OnInit {
       console.error('Geolocation is not supported by this browser.');
     }
   }
+
 }
