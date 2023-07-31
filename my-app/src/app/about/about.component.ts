@@ -1,5 +1,16 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import * as L from 'leaflet';
 
+interface Position {
+  coords: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
+interface PositionError {
+  message: string;
+}
 
 @Component({
   selector: 'app-about',
@@ -7,62 +18,38 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
   styleUrls: ['./about.component.css']
 })
 export class AboutComponent implements OnInit {
-  title = 'locationApp';
-  @ViewChild('mapElement') mapElement!: ElementRef;
+  map!: L.Map;
+  currentLocation!: L.Marker;
 
   ngOnInit() {
-    this.loadGoogleMaps();
-    this.initMap();
-  }
+    this.map = L.map('map').setView([0, 0], 13);
 
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.map);
 
-  loadGoogleMaps(): Promise<void> {
-    return new Promise<void>((resolve) => {
-      (window as any)['initGoogleMaps'] = () => {
-        resolve();
-      };
-
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initGoogleMaps`;
-      document.body.appendChild(script);
-    });
-  }
-
-
-  initMap() {
-    if (!navigator.geolocation) {
-      console.log('Geolocation is not supported');
-      return;
-    }
-
-    /*if (!google || !google.maps) {
-      console.log('Google Maps API not loaded');
-      return;
-    }*/
-
-    //se ia pozitia curenta si e setata ca centrul hartii
-    navigator.geolocation.getCurrentPosition((position) => {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-
-      const mapOptions = {
-        center: { lat: latitude, lng: longitude },
-        zoom: 14
-      };
-
-
-      const map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
-
-      // adauga marker la pozitia curenta 
-      const marker = new google.maps.Marker({
-        position: { lat: latitude, lng: longitude },
-        map: map,
-        title: 'You are here!'
-      });
-    });
+    this.getCurrentLocation();
   }
 
   getCurrentLocation() {
-    this.initMap();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position: Position) => {
+          const { latitude, longitude } = position.coords;
+          this.map.setView([latitude, longitude], 13);
+
+          if (!this.currentLocation) {
+            this.currentLocation = L.marker([latitude, longitude]).addTo(this.map);
+          } else {
+            this.currentLocation.setLatLng([latitude, longitude]);
+          }
+        },
+        (error: PositionError) => {
+          console.error('Error getting current location:', error.message);
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+    }
   }
 }
